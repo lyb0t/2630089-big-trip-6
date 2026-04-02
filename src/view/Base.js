@@ -1,8 +1,8 @@
 import { createElement } from "../render";
 
-export default class Base {
+export default class BaseView {
   constructor() {
-    if (new.target === Base) {
+    if (new.target === BaseView) {
       throw new Error("Can't use without new");
     }
   }

@@ -1,6 +1,6 @@
-import Base from "./base";
+import BaseView from "./base";
 
-export default class Filters extends Base {
+export default class FiltersView extends BaseView {
   getTemplate() {
     return `
       <form class="trip-filters" action="#" method="get">

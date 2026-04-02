@@ -1,16 +1,15 @@
-import EditForm from "./view/EditForm";
-import Filters from "./view/Filters";
-import Sorting from "./view/Sorting";
-import Point from "./view/Point";
+import EditFormView from "./view/EditForm";
+import FiltersView from "./view/Filters";
+import SortingView from "./view/Sorting";
+import PointView from "./view/Point";
+import CreateFormView from "./view/CreateForm";
 import { render, RenderPosition } from "./render";
-import CreateForm from "./view/CreateForm";
+import { mockPoints } from "./mock/point";
 
 export default function present() {
-  const createForm = new CreateForm();
-  const editForm = new EditForm();
-  const filters = new Filters();
-  const sorting = new Sorting();
-  const point = new Point();
+  const createForm = new CreateFormView();
+  const filters = new FiltersView();
+  const sorting = new SortingView();
 
   const contentContainer = document.querySelector(".trip-events");
   render(
@@ -20,8 +19,8 @@ export default function present() {
   );
   render(sorting, contentContainer, RenderPosition.BEFOREEND);
   render(createForm, contentContainer, RenderPosition.BEFOREEND);
-  render(point, contentContainer, RenderPosition.BEFOREEND);
-  render(point, contentContainer, RenderPosition.BEFOREEND);
-  render(editForm, contentContainer, RenderPosition.BEFOREEND);
-  render(point, contentContainer, RenderPosition.BEFOREEND);
+  render(new PointView(mockPoints[0]), contentContainer, RenderPosition.BEFOREEND);
+  render(new PointView(mockPoints[0]), contentContainer, RenderPosition.BEFOREEND);
+  render(new EditFormView(mockPoints[0]), contentContainer, RenderPosition.BEFOREEND);
+  render(new PointView(mockPoints[0]), contentContainer, RenderPosition.BEFOREEND);
 }

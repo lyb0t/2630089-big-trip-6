@@ -1,6 +1,6 @@
-import Base from "./base";
+import BaseView from "./base";
 
-export default class Sorting extends Base {
+export default class SortingView extends BaseView {
   getTemplate() {
     return `
       <form class="trip-events__trip-sort  trip-sort" action="#" method="get">

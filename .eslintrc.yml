@@ -10,3 +10,4 @@ extends: 'htmlacademy/vanilla'
 
 rules:
   quotes: ['error', 'double']
+  indent: ['warn', 2]
