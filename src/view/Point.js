@@ -7,10 +7,11 @@ import {
 } from "../utils";
 
 export default class PointView extends AbstractView {
-  constructor(point, onEdit) {
+  constructor(point, onEdit, onFavoriteClick) {
     super();
     this.point = point;
     this.onEdit = onEdit;
+    this.onFavoriteClick = onFavoriteClick;
   }
 
   get template() {
@@ -67,7 +68,9 @@ export default class PointView extends AbstractView {
             )}
             
           </ul>
-          <button class="event__favorite-btn event__favorite-btn--active" type="button">
+          <button class="event__favorite-btn ${
+            !this.point.isFavorite ? "" : "event__favorite-btn--active"
+          }" type="button">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
               <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -88,6 +91,13 @@ export default class PointView extends AbstractView {
     const elem = createElement(this.template);
     const editBtn = elem.querySelector(".event__rollup-btn");
     editBtn.addEventListener("click", (e) => this.onEdit(e, this, elem));
+
+    const favBtn = elem.querySelector(".event__favorite-btn");
+    favBtn.addEventListener("click", (e) => {
+      this.onFavoriteClick(e, this, elem);
+      this.point.isFavorite = !this.point.isFavorite;
+      favBtn.classList.toggle("event__favorite-btn--active");
+    });
     this._element = elem;
     return this._element;
   }

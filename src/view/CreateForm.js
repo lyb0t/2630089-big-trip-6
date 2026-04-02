@@ -3,7 +3,7 @@ import AbstractView from "../framework/view/abstract-view";
 import { capitalizeFirstLetter } from "../utils";
 
 export default class CreateFormView extends AbstractView {
-  constructor(point, onSubmit, onReject=onSubmit) {
+  constructor(point, onSubmit, onReject = onSubmit) {
     super();
     this.point = point;
     this.onSubmit = onSubmit;
@@ -179,10 +179,14 @@ export default class CreateFormView extends AbstractView {
   }
 
   get element() {
-    if (this._element) return this._element;
+    if (this._element) {
+      return this._element;
+    }
     const elem = createElement(this.template);
     elem.addEventListener("submit", this.onSubmit);
-    elem.querySelector('.event__rollup-btn').addEventListener('click', this.onReject)
+    elem
+      .querySelector(".event__rollup-btn")
+      .addEventListener("click", this.onReject);
     this._element = elem;
     return elem;
   }

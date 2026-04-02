@@ -1,10 +1,8 @@
-import EditFormView from "./view/EditForm";
+import { render, RenderPosition } from "./framework/render";
+import { mockPoints } from "./mock/point";
+import PointPresenter from "./presenters/Point";
 import FiltersView from "./view/Filters";
 import SortingView from "./view/Sorting";
-import PointView from "./view/Point";
-import CreateFormView from "./view/CreateForm";
-import { mockPoints } from "./mock/point";
-import { render, RenderPosition, replace } from "./framework/render";
 
 export default function present() {
   const filters = new FiltersView();
@@ -17,29 +15,6 @@ export default function present() {
     RenderPosition.BEFOREEND
   );
 
-  const onEditPoint = (e, point) => {
-    const close = (editForm) => {
-      replace(point, editForm);
-      document.removeEventListener("keyup", onEsc);
-    };
-    const onEsc = (e) => {
-      if (e.key === "Escape") {
-        close(editForm);
-      }
-    };
-    const editForm = new EditFormView(
-      point.point,
-      (e) => {
-        e.preventDefault();
-        close(editForm);
-      },
-      () => close(editForm)
-    );
-    document.addEventListener("keyup", onEsc);
-
-    replace(editForm, point);
-  };
-
   render(sorting, contentContainer, RenderPosition.BEFOREEND);
   // render(createForm, contentContainer, RenderPosition.BEFOREEND);
   // render(
@@ -47,19 +22,16 @@ export default function present() {
   //   contentContainer,
   //   RenderPosition.BEFOREEND
   // );
-  render(
-    new PointView(mockPoints[0], onEditPoint),
-    contentContainer,
-    RenderPosition.BEFOREEND
-  );
-  render(
-    new PointView(mockPoints[0], onEditPoint),
-    contentContainer,
-    RenderPosition.BEFOREEND
-  );
-  render(
-    new PointView(mockPoints[0], onEditPoint),
-    contentContainer,
-    RenderPosition.BEFOREEND
-  );
+
+  const closeAllForms = (presenters) => {
+    presenters.forEach((pr) => pr.closeEditForm());
+  };
+
+  const pointPresenters = [
+    new PointPresenter(mockPoints[0], () => closeAllForms(pointPresenters)),
+    new PointPresenter(mockPoints[0], () => closeAllForms(pointPresenters)),
+    new PointPresenter(mockPoints[0], () => closeAllForms(pointPresenters)),
+  ];
+
+  pointPresenters.forEach((pr) => pr.present());
 }
