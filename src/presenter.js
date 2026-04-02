@@ -1,11 +1,8 @@
-import EditFormView from "./view/EditForm";
+import { render, RenderPosition } from "./framework/render";
+import { mockPoints } from "./mock/point";
+import PointPresenter from "./presenters/Point";
 import FiltersView from "./view/Filters";
 import SortingView from "./view/Sorting";
-import PointView from "./view/Point";
-import CreateFormView from "./view/CreateForm";
-import { mockPoints } from "./mock/point";
-import { render, RenderPosition, replace } from "./framework/render";
-import PointPresenter from "./presenters/Point";
 
 export default function present() {
   const filters = new FiltersView();
@@ -25,8 +22,16 @@ export default function present() {
   //   contentContainer,
   //   RenderPosition.BEFOREEND
   // );
-  
-  new PointPresenter(mockPoints[0]).present()
-  new PointPresenter(mockPoints[0]).present()
-  new PointPresenter(mockPoints[0]).present()
+
+  const closeAllForms = (presenters) => {
+    presenters.forEach((pr) => pr.closeEditForm());
+  };
+
+  const pointPresenters = [
+    new PointPresenter(mockPoints[0], () => closeAllForms(pointPresenters)),
+    new PointPresenter(mockPoints[0], () => closeAllForms(pointPresenters)),
+    new PointPresenter(mockPoints[0], () => closeAllForms(pointPresenters)),
+  ];
+
+  pointPresenters.forEach((pr) => pr.present());
 }
