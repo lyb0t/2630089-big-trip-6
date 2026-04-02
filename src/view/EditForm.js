@@ -1,10 +1,13 @@
+import { createElement } from "../framework/render";
+import AbstractView from "../framework/view/abstract-view";
 import { capitalizeFirstLetter } from "../utils";
-import BaseView from "./base";
 
-export default class EditFormView extends BaseView {
-  constructor(point) {
+export default class EditFormView extends AbstractView {
+  constructor(point, onSubmit, onReject=onSubmit) {
     super();
     this.point = point;
+    this.onSubmit = onSubmit;
+    this.onReject = onReject;
   }
 
   _formatDate(d) {
@@ -18,14 +21,16 @@ export default class EditFormView extends BaseView {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
 
-  getTemplate() {
+  get template() {
     return `
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${this.point.type}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${
+                this.point.type
+              }.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -87,16 +92,20 @@ export default class EditFormView extends BaseView {
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${this.point.destination.map((dest) => `<option value="${dest.name}"></option>`)}
+              <option value="${this.point.destination.name}"></option>
             </datalist>
           </div>
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${this._formatDate(this.point.dateFrom)}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${this._formatDate(
+              this.point.dateFrom
+            )}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${this._formatDate(this.point.dateTo)}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${this._formatDate(
+              this.point.dateTo
+            )}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -104,7 +113,9 @@ export default class EditFormView extends BaseView {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this.point.price}">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${
+              this.point.basePrice
+            }">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -118,7 +129,8 @@ export default class EditFormView extends BaseView {
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
-              ${this.point.offers.map((offer) => `
+              ${this.point.offers.map(
+                (offer) => `
                 <div class="event__offer-selector">
                   <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" checked>
                   <label class="event__offer-label" for="${offer.id}">
@@ -127,21 +139,36 @@ export default class EditFormView extends BaseView {
                     <span class="event__offer-price">${offer.price}</span>
                   </label>
                 </div>
-                `)}
+                `
+              )}
             </div>
           </section>
           ${
-            !this.point.destination ? "" : `
+            !this.point.destination
+              ? ""
+              : `
             <section class="event__section  event__section--destination">
               <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-              <p class="event__destination-description">${this.point.destination.description}</p>
-              ${!(this.point.destination && this.point.destination.pictures?.length > 0) ? "" : `
+              <p class="event__destination-description">${
+                this.point.destination.description
+              }</p>
+              ${
+                !(
+                  this.point.destination &&
+                  this.point.destination.pictures?.length > 0
+                )
+                  ? ""
+                  : `
                 <div class="event__photos-container">
                   <div class="event__photos-tape">
-                    ${this.point.destination.pictures.map((pic) => `<img class="event__photo" src="${pic.src}" alt="${pic.description}">`)}
+                    ${this.point.destination.pictures.map(
+                      (pic) =>
+                        `<img class="event__photo" src="${pic.src}" alt="${pic.description}">`
+                    )}
                   </div>
                 </div>
-              ` }
+              `
+              }
             </section>
             `
           }
@@ -149,5 +176,14 @@ export default class EditFormView extends BaseView {
         </section>
       </form>
     `;
+  }
+
+  get element() {
+    if (this._element) return this._element;
+    const elem = createElement(this.template);
+    elem.addEventListener("submit", this.onSubmit);
+    elem.querySelector('.event__rollup-btn').addEventListener('click', this.onReject)
+    this._element = elem;
+    return elem;
   }
 }

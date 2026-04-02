@@ -1,7 +1,7 @@
-import BaseView from "./base";
+import AbstractView from "../framework/view/abstract-view";
 
-export default class CreateFormView extends BaseView {
-  getTemplate() {
+export default class CreateFormView extends AbstractView {
+  get template() {
     return `
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">

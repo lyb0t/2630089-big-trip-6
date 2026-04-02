@@ -1,7 +1,7 @@
-import BaseView from "./base";
+import AbstractView from "../framework/view/abstract-view";
 
-export default class FiltersView extends BaseView {
-  getTemplate() {
+export default class FiltersView extends AbstractView {
+  get template() {
     return `
       <form class="trip-filters" action="#" method="get">
         <div class="trip-filters__filter">

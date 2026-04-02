@@ -48,15 +48,19 @@ function dateDifference(date1, date2) {
   const diffHours = Math.floor(diffMinutes / 60);
   const diffDays = Math.floor(diffHours / 24);
 
+  const remainderSeconds = diffSeconds % 60;
+  const remainderMinutes = diffMinutes % 60;
+  const remainderHours = diffHours % 24;
+
   let diffStr = "";
   if (diffDays) {
     diffStr += ` ${padZero(diffDays)}D`;
   }
-  if (diffHours) {
-    diffStr += ` ${padZero(diffHours)}H`;
+  if (remainderHours) {
+    diffStr += ` ${padZero(remainderHours)}H`;
   }
-  if (diffMinutes) {
-    diffStr += ` ${padZero(diffMinutes)}M`;
+  if (remainderMinutes) {
+    diffStr += ` ${padZero(remainderMinutes)}M`;
   }
 
   return {
@@ -65,6 +69,9 @@ function dateDifference(date1, date2) {
     minutes: diffMinutes,
     hours: diffHours,
     days: diffDays,
+    remainderSeconds,
+    remainderMinutes,
+    remainderHours,
     diffStr: diffStr.slice(1),
   };
 }

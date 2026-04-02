@@ -1,17 +1,19 @@
+import { createElement } from "../framework/render";
+import AbstractView from "../framework/view/abstract-view";
 import {
   capitalizeFirstLetter,
   dateDifference,
   formatToMonthDay,
 } from "../utils";
-import BaseView from "./base";
 
-export default class PointView extends BaseView {
-  constructor(point) {
+export default class PointView extends AbstractView {
+  constructor(point, onEdit) {
     super();
     this.point = point;
+    this.onEdit = onEdit;
   }
 
-  getTemplate() {
+  get template() {
     return `
       <li class="trip-events__item">
         <div class="event">
@@ -29,19 +31,23 @@ export default class PointView extends BaseView {
           )}</h3>
           <div class="event__schedule">
             <p class="event__time">
-            // 2019-07-10T22:55:56.845Z
               <time class="event__start-time" datetime="${
                 this.point.dateFrom
-              }">10:30</time>
+              }">${
+      new Date(this.point.dateFrom).getHours() +
+      ":" +
+      new Date(this.point.dateFrom).getMinutes()
+    }</time>
               &mdash;
-              <time class="event__end-time" datetime="${
-                this.point.dateTo
-              }">11:00</time>
+              <time class="event__end-time" datetime="${this.point.dateTo}">${
+      new Date(this.point.dateFrom).getHours() +
+      ":" +
+      new Date(this.point.dateTo).getMinutes()
+    }</time>
             </p>
-            <p class="event__duration">${dateDifference(
-              this.point.dateFrom,
-              this.point.dateTo
-            )}</p>
+            <p class="event__duration">${
+              dateDifference(this.point.dateFrom, this.point.dateTo).diffStr
+            }</p>
           </div>
           <p class="event__price">
             &euro;&nbsp;<span class="event__price-value">${
@@ -73,5 +79,14 @@ export default class PointView extends BaseView {
         </div>
       </li>
     `;
+  }
+
+  get element() {
+    if (this._element) return this._element;
+    const elem = createElement(this.template);
+    const editBtn = elem.querySelector(".event__rollup-btn");
+    editBtn.addEventListener("click", (e) => this.onEdit(e, this, elem));
+    this._element = elem;
+    return this._element;
   }
 }
