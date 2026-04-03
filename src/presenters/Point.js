@@ -1,4 +1,4 @@
-import { render, RenderPosition, replace } from "../framework/render";
+import { remove, render, RenderPosition, replace } from "../framework/render";
 import EditFormView from "../view/EditForm";
 import PointView from "../view/Point";
 
@@ -7,6 +7,7 @@ export default class PointPresenter {
     if (!point) {
       throw new Error("No point");
     }
+    this.id = point.id;
     this.onOpenEditForm = onOpenEditForm;
     this._editForm = null;
     this._onKeyUp = null;
@@ -60,14 +61,8 @@ export default class PointPresenter {
     this.point = point;
   };
 
-  represent() {
-    const newPointView = new PointView(
-      this.point,
-      this.openEditForm,
-      this.toggleFavorite
-    );
-    replace(newPointView, this._pointView);
-    this._pointView = newPointView;
+  remove() {
+    remove(this._pointView);
   }
 
   present() {

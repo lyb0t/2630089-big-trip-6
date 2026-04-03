@@ -1,12 +1,11 @@
 import { render, RenderPosition } from "./framework/render";
 import { mockPoints } from "./mock/point";
-import PointPresenter from "./presenters/Point";
+import PointListPresenter from "./presenters/PointList";
 import FiltersView from "./view/Filters";
 import SortingView from "./view/Sorting";
 
 export default function present() {
   const filters = new FiltersView();
-  const sorting = new SortingView();
 
   const contentContainer = document.querySelector(".trip-events");
   render(
@@ -15,7 +14,6 @@ export default function present() {
     RenderPosition.BEFOREEND
   );
 
-  render(sorting, contentContainer, RenderPosition.BEFOREEND);
   // render(createForm, contentContainer, RenderPosition.BEFOREEND);
   // render(
   //   new EditFormView(mockPoints[0], onSubmitEdit),
@@ -23,15 +21,14 @@ export default function present() {
   //   RenderPosition.BEFOREEND
   // );
 
-  const closeAllForms = (presenters) => {
-    presenters.forEach((pr) => pr.closeEditForm());
-  };
+  const pointListPresenter = new PointListPresenter(mockPoints);
+  pointListPresenter.present();
 
-  const pointPresenters = [
-    new PointPresenter(mockPoints[0], () => closeAllForms(pointPresenters)),
-    new PointPresenter(mockPoints[0], () => closeAllForms(pointPresenters)),
-    new PointPresenter(mockPoints[0], () => closeAllForms(pointPresenters)),
-  ];
-
-  pointPresenters.forEach((pr) => pr.present());
+  render(
+    new SortingView((e, sortType) =>
+      pointListPresenter.changeSortType(sortType)
+    ),
+    contentContainer,
+    RenderPosition.AFTERBEGIN
+  );
 }
