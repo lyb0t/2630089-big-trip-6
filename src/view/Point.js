@@ -1,10 +1,10 @@
+import flatpickr from "flatpickr";
 import AbstractStatefulView from "../framework/view/abstract-stateful-view";
+import { capitalizeFirstLetter } from "../utils";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 
-import {
-  capitalizeFirstLetter,
-  dateDifference,
-  formatToMonthDay,
-} from "../utils";
+dayjs.extend(duration);
 
 export default class PointView extends AbstractStatefulView {
   constructor(point, onEdit, onFavoriteClick) {
@@ -26,13 +26,31 @@ export default class PointView extends AbstractStatefulView {
     });
   }
 
+  _formatDuration(dateFrom, dateTo) {
+    const diffMs = dayjs(dateTo).diff(dayjs(dateFrom));
+    const dur = dayjs.duration(diffMs);
+    const days = Math.floor(dur.asDays());
+    const hours = dur.hours();
+    const minutes = dur.minutes();
+
+    if (days > 0) {
+      return `${days}D ${hours}H ${minutes}M`;
+    } else if (hours > 0) {
+      return `${hours}H ${minutes}M`;
+    } else {
+      return `${minutes}M`;
+    }
+  }
+
   get template() {
+    const dateFrom = dayjs(this._state.dateFrom);
+    const dateTo = dayjs(this._state.dateTo);
+
     return `
       <li class="trip-events__item">
         <div class="event">
-          <time class="event__date" datetime="2019-03-18">${formatToMonthDay(
-            this._state.dateFrom
-          )}
+          <time class="event__date" datetime="${dateFrom.format("YYYY-MM-DD")}">
+            ${dateFrom.format("MMM D")}
           </time>
           <div class="event__type">
             <img class="event__type-icon" width="42" height="42" src="img/icons/${
@@ -44,25 +62,19 @@ export default class PointView extends AbstractStatefulView {
           )}</h3>
           <div class="event__schedule">
             <p class="event__time">
-              <time class="event__start-time" datetime="${
-                this._state.dateFrom
-              }">${`
-      ${new Date(this._state.dateFrom).getHours()} : ${new Date(
-      this._state.dateFrom
-    ).getMinutes()}
-    `}</time>
+              <time class="event__start-time" datetime="${dateFrom.toISOString()}">
+                ${dateFrom.format("HH:mm")}
+              </time>
               &mdash;
-              <time class="event__end-time" datetime="${this._state.dateTo}">${`
-      ${new Date(this._state.dateTo).getHours()} : ${new Date(
-      this._state.dateTo
-    ).getMinutes()}
-    `}</time>
+              <time class="event__end-time" datetime="${dateTo.toISOString()}">
+                ${dateTo.format("HH:mm")}
+              </time>
             </p>
             <p class="event__duration" data-date-from="${
               this._state.dateFrom
-            }" data-date-to="${this._state.dateTo}">${
-      dateDifference(this._state.dateFrom, this._state.dateTo).diffStr
-    }</p>
+            }" data-date-to="${this._state.dateTo}">
+              ${this._formatDuration(this._state.dateFrom, this._state.dateTo)}
+            </p>
           </div>
           <p class="event__price">
             &euro;&nbsp;<span class="event__price-value">${
@@ -79,7 +91,6 @@ export default class PointView extends AbstractStatefulView {
               <span class="event__offer-price">${offer.price}</span>
             </li>`
             )}
-            
           </ul>
           <button class="event__favorite-btn ${
             !this._state.isFavorite ? "" : "event__favorite-btn--active"
