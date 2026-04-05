@@ -1,34 +1,23 @@
-import { render, RenderPosition } from "./framework/render";
-import { mockPoints } from "./mock/point";
+import FiltersPresenter from "./presenters/Filters";
 import PointListPresenter from "./presenters/PointList";
-import FiltersView from "./view/Filters";
-import SortingView from "./view/Sorting";
+import SortingPresenter from "./presenters/Sorting";
 
-export default function present() {
-  const filters = new FiltersView();
-
-  const contentContainer = document.querySelector(".trip-events");
-  render(
-    filters,
-    document.querySelector(".trip-controls__filters"),
-    RenderPosition.BEFOREEND
-  );
-
+export default function present(pointsModel, filtersModel, sortingModel) {
+  const filtersPresenter = new FiltersPresenter(filtersModel, sortingModel);
+  filtersPresenter.present();
   // render(createForm, contentContainer, RenderPosition.BEFOREEND);
   // render(
   //   new EditFormView(mockPoints[0], onSubmitEdit),
-  //   contentContainer,
   //   RenderPosition.BEFOREEND
   // );
 
-  const pointListPresenter = new PointListPresenter(mockPoints);
-  pointListPresenter.present();
+  const sortingPresenter = new SortingPresenter(sortingModel);
+  sortingPresenter.present();
 
-  render(
-    new SortingView((e, sortType) =>
-      pointListPresenter.changeSortType(sortType)
-    ),
-    contentContainer,
-    RenderPosition.AFTERBEGIN
+  const pointListPresenter = new PointListPresenter(
+    pointsModel,
+    filtersModel,
+    sortingModel
   );
+  pointListPresenter.present();
 }

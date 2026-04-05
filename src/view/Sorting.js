@@ -7,6 +7,20 @@ export default class SortingView extends AbstractView {
     this._onChange = onChange;
   }
 
+  changeSelectedSort(newSortType) {
+    const elem = this.element;
+    const sortInputs = elem.querySelectorAll(
+      ".trip-sort__item[data-sort-type] input"
+    );
+    sortInputs.forEach((input) => {
+      if (input.parentElement.getAttribute("data-sort-type") === newSortType) {
+        input.checked = true;
+      } else {
+        input.checked = false;
+      }
+    });
+  }
+
   get template() {
     return `
       <form class="trip-events__trip-sort  trip-sort" action="#" method="get">

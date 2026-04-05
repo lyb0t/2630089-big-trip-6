@@ -1,33 +1,48 @@
-import { remove, render, RenderPosition, replace } from "../framework/render";
-import EditFormView from "../view/EditForm";
-import PointView from "../view/Point";
+import {
+  remove,
+  render,
+  RenderPosition,
+  replace,
+} from "../../framework/render";
+import EditFormView from "../../view/EditForm";
+import PointView from "../../view/Point";
+import DestinationsModel from "../../model/Destinations";
+import OffersModel from "../../model/Offers";
 
 export default class PointPresenter {
-  constructor(point, onOpenEditForm) {
+  #point = null;
+
+  constructor(point, onOpenEditForm, onSubmit, onDelete) {
     if (!point) {
       throw new Error("No point");
     }
     this.id = point.id;
     this._onOpenEditForm = onOpenEditForm;
+    this._onSubmit = onSubmit;
+    this._onDelete = onDelete;
     this._editForm = null;
     this._onKeyUp = null;
     this._pointView = null;
-    this.point = point;
+    this.#point = point;
   }
 
   toggleFavorite = () => {
-    this.point.isFavorite = !this.point.isFavorite;
+    this.#point.isFavorite = !this.#point.isFavorite;
   };
 
   openEditForm = () => {
     this._onOpenEditForm();
     this._editForm = new EditFormView(
-      this.point,
-      (e, point) => {
-        e.preventDefault();
+      this.#point,
+      DestinationsModel.destinations,
+      OffersModel.offers,
+      (point) => {
         this.closeAndSaveEditForm(point);
       },
-      this.closeEditForm
+      () => this.closeEditForm(),
+      () => {
+        this._onDelete(this.#point.id);
+      }
     );
 
     const close = () => {};
@@ -58,7 +73,8 @@ export default class PointPresenter {
       throw new Error("no point in closeAndSaveEditForm");
     }
     this.closeEditForm();
-    this.point = point;
+    this.#point = point;
+    this._onSubmit(point);
   };
 
   remove() {
@@ -68,7 +84,7 @@ export default class PointPresenter {
   present() {
     const contentContainer = document.querySelector(".trip-events");
     this._pointView = new PointView(
-      this.point,
+      this.#point,
       this.openEditForm,
       this.toggleFavorite
     );

@@ -1,26 +1,43 @@
 import flatpickr from "flatpickr";
 import AbstractStatefulView from "../framework/view/abstract-stateful-view";
-import { mockDestinations } from "../mock/point";
 import { capitalizeFirstLetter } from "../utils";
 import "flatpickr/dist/flatpickr.min.css";
 
 export default class EditFormView extends AbstractStatefulView {
-  constructor(point, onSubmit, onReject = onSubmit) {
+  #datePickerFrom = "";
+  #datePickerTo = "";
+  #destinations = [];
+  #offers = [];
+  #onSubmit = () => {};
+  #onReject = () => {};
+  #onDelete = () => {};
+  constructor(
+    point,
+    destinations,
+    offers,
+    onSubmit = () => {},
+    onReject = () => {},
+    onDelete = () => {}
+  ) {
     super(point);
-    this._datePickerFrom = null;
-    this._datePickerTo = null;
-    this.onSubmit = onSubmit;
-    this.onReject = onReject;
+
+    this.#datePickerFrom = null;
+    this.#datePickerTo = null;
+    this.#destinations = destinations;
+    this.#offers = offers;
+    this.#onSubmit = onSubmit;
+    this.#onReject = onReject;
+    this.#onDelete = onDelete;
   }
 
   _destroyDatePickers() {
-    if (this._datePickerFrom) {
-      this._datePickerFrom.destroy();
-      this._datePickerFrom = null;
+    if (this.#datePickerFrom) {
+      this.#datePickerFrom.destroy();
+      this.#datePickerFrom = null;
     }
-    if (this._datePickerTo) {
-      this._datePickerTo.destroy();
-      this._datePickerTo = null;
+    if (this.#datePickerTo) {
+      this.#datePickerTo.destroy();
+      this.#datePickerTo = null;
     }
   }
 
@@ -28,8 +45,8 @@ export default class EditFormView extends AbstractStatefulView {
     const fromInput = this.element.querySelector("#event-start-time-1");
     const toInput = this.element.querySelector("#event-end-time-1");
 
-    if (fromInput && !this._datePickerFrom) {
-      this._datePickerFrom = flatpickr(fromInput, {
+    if (fromInput && !this.#datePickerFrom) {
+      this.#datePickerFrom = flatpickr(fromInput, {
         enableTime: true,
         dateFormat: "d/m/y H:i",
         defaultDate: this._state.dateFrom,
@@ -41,8 +58,8 @@ export default class EditFormView extends AbstractStatefulView {
       });
     }
 
-    if (toInput && !this._datePickerTo) {
-      this._datePickerTo = flatpickr(toInput, {
+    if (toInput && !this.#datePickerTo) {
+      this.#datePickerTo = flatpickr(toInput, {
         enableTime: true,
         dateFormat: "d/m/y H:i",
         defaultDate: this._state.dateTo,
@@ -57,16 +74,23 @@ export default class EditFormView extends AbstractStatefulView {
 
   _restoreHandlers() {
     this._destroyDatePickers();
-    this.element.addEventListener("submit", (e) =>
-      this.onSubmit(e, this._state)
-    );
+    this.element.addEventListener("submit", (e) => {
+      e.preventDefault();
+      this.#onSubmit(e, this._state);
+    });
     this.element
       .querySelector(".event__rollup-btn")
-      .addEventListener("click", this.onReject);
+      .addEventListener("click", (e) => {
+        e.preventDefault();
+        this.#onReject();
+      });
 
     this.element
       .querySelector(".event__reset-btn")
-      .addEventListener("click", this.onReject);
+      .addEventListener("click", (e) => {
+        e.preventDefault();
+        this.#onDelete();
+      });
 
     this.element
       .querySelector(".event__type-group")
@@ -79,20 +103,39 @@ export default class EditFormView extends AbstractStatefulView {
     this.element
       .querySelector(".event__input--destination")
       .addEventListener("blur", (e) => {
-        this.updateElement({
-          destination: e.target.value,
-        });
+        const finded = this._findDestinationByName(e.target.value);
+        if (finded) {
+          this.updateElement({
+            destination: finded,
+          });
+        } else {
+          this.updateElement({
+            destination: this.#destinations[0],
+          });
+        }
       });
 
     this._initDatePickers();
   }
 
-  _findDestination(name) {
-    return mockDestinations.find((dest) => dest.name === name);
+  _findDestinationByName(name) {
+    return this.#destinations.find((dest) => dest.name === name);
+  }
+
+  _findOfferByName(name) {
+    return this.#destinations.find((dest) => dest.name === name);
+  }
+
+  _findOfferById(id) {
+    return this.#destinations.find((dest) => dest.id === id);
   }
 
   get template() {
-    const destination = this._findDestination(this._state.destination);
+    const destination = this._state.destination;
+    const offersObj = this.#offers.find(
+      (offer) => offer.type === this._state.type
+    );
+    const offers = offersObj ? offersObj.offers : [];
     return `
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
@@ -162,10 +205,10 @@ export default class EditFormView extends AbstractStatefulView {
               ${capitalizeFirstLetter(this._state.type)}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${
-              this._state.destination
+              this._state.destination.name
             }" list="destination-list-1">
             <datalist id="destination-list-1">
-            ${mockDestinations
+            ${this.#destinations
               .map((dest) => `<option value="${dest.name}"></option>`)
               .join("")}
             </datalist>
@@ -200,8 +243,9 @@ export default class EditFormView extends AbstractStatefulView {
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
-              ${this._state.offers.map(
-                (offer) => `
+              ${offers
+                .map(
+                  (offer) => `
                 <div class="event__offer-selector">
                   <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" checked>
                   <label class="event__offer-label" for="${offer.id}">
@@ -211,7 +255,8 @@ export default class EditFormView extends AbstractStatefulView {
                   </label>
                 </div>
                 `
-              )}
+                )
+                .join("")}
             </div>
           </section>
           ${
@@ -219,10 +264,19 @@ export default class EditFormView extends AbstractStatefulView {
               ? ""
               : `
             <section class="event__section  event__section--destination">
-              <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-              <p class="event__destination-description">${
+              ${
                 destination.description
-              }</p>
+                  ? `<h3 class="event__section-title  event__section-title--destination">Destination</h3>`
+                  : ""
+              }
+              ${
+                destination.description
+                  ? `<p class="event__destination-description">
+                    ${destination.description}
+                  </p>`
+                  : ""
+              }
+
               ${
                 !(destination.pictures?.length > 0)
                   ? ""

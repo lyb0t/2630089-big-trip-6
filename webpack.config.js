@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   mode: "development",
@@ -19,7 +20,7 @@ module.exports = {
     rules: [
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        use: ["style-loader", "css-loader"],
       },
       {
         test: /\.js$/,
@@ -37,7 +38,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "public/index.html"),
-      inject: 'body',       // вставлять скрипты в body
+      inject: "body", // вставлять скрипты в body
       minify: false,
     }),
 
@@ -52,5 +53,6 @@ module.exports = {
         },
       ],
     }),
+    new Dotenv(),
   ],
 };

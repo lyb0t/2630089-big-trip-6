@@ -1,4 +1,3 @@
-import flatpickr from "flatpickr";
 import AbstractStatefulView from "../framework/view/abstract-stateful-view";
 import { capitalizeFirstLetter } from "../utils";
 import dayjs from "dayjs";
@@ -45,7 +44,6 @@ export default class PointView extends AbstractStatefulView {
   get template() {
     const dateFrom = dayjs(this._state.dateFrom);
     const dateTo = dayjs(this._state.dateTo);
-
     return `
       <li class="trip-events__item">
         <div class="event">

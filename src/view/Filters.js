@@ -1,6 +1,19 @@
 import AbstractView from "../framework/view/abstract-view";
 
 export default class FiltersView extends AbstractView {
+  constructor(onFilterChange = () => {}) {
+    super();
+    const form = this.element;
+
+    form.addEventListener("change", (event) => {
+      const target = event.target;
+      if (target.type === "radio" && target.name === "trip-filter") {
+        console.log("Выбран фильтр:", target.value);
+        onFilterChange(target.value);
+      }
+    });
+  }
+
   get template() {
     return `
       <form class="trip-filters" action="#" method="get">
