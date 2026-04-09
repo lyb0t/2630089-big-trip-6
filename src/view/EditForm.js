@@ -11,14 +11,14 @@ export default class EditFormView extends AbstractStatefulView {
   #onSubmit = () => {};
   #onReject = () => {};
   #onDelete = () => {};
-  constructor(
+  constructor({
     point,
     destinations,
     offers,
     onSubmit = () => {},
     onReject = () => {},
-    onDelete = () => {}
-  ) {
+    onDelete = () => {},
+  }) {
     super(point);
 
     this.#datePickerFrom = null;
@@ -28,6 +28,24 @@ export default class EditFormView extends AbstractStatefulView {
     this.#onSubmit = onSubmit;
     this.#onReject = onReject;
     this.#onDelete = onDelete;
+  }
+
+  _toggleOffer(id) {
+    const offers = this._state.offers;
+    const offerIndex = offers.indexOf((off) => off.id === id);
+    console.log("offers", offers);
+    if (offerIndex === -1) {
+      this._state = {
+        ...this._state,
+        offers: Array.from([...this._state.offers, id]),
+      };
+    } else {
+      this._state = {
+        ...this._state,
+        offers: Array.from(this._state.offers.filter((off) => off.id !== id)),
+      };
+    }
+    console.log("offers choosed", this._state.offers);
   }
 
   _destroyDatePickers() {
@@ -114,6 +132,12 @@ export default class EditFormView extends AbstractStatefulView {
           });
         }
       });
+
+    this.element.querySelectorAll(".event__offer-selector").forEach((el) =>
+      el.addEventListener("click", (e) => {
+        this._toggleOffer(e.currentTarget.getAttribute("data-offer-id"));
+      })
+    );
 
     this._initDatePickers();
   }
@@ -239,14 +263,19 @@ export default class EditFormView extends AbstractStatefulView {
           </button>
         </header>
         <section class="event__details">
+        ${
+          offers.length > 0
+            ? `
           <section class="event__section  event__section--offers">
-            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
+            <h3 class="event__section-title  event__section-title--offers">
+                  Offers
+            </h3>
+            
             <div class="event__available-offers">
               ${offers
                 .map(
                   (offer) => `
-                <div class="event__offer-selector">
+                <div class="event__offer-selector" data-offer-id="${offer.id}">
                   <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" checked>
                   <label class="event__offer-label" for="${offer.id}">
                     <span class="event__offer-title">${offer.title}</span>
@@ -258,7 +287,9 @@ export default class EditFormView extends AbstractStatefulView {
                 )
                 .join("")}
             </div>
-          </section>
+          </section>`
+            : ""
+        }
           ${
             !destination
               ? ""

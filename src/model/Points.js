@@ -1,9 +1,14 @@
 import { API_ROUTES } from "../const";
 import { myFetch } from "../utils";
-import DestinationsModel from "./Destinations";
+
 export class PointsModel {
   #points = [];
+  #destinationsModel = null;
   #changeListeners = [];
+
+  constructor({ destinationsModel }) {
+    this.#destinationsModel = destinationsModel;
+  }
 
   addChangeListener(listener) {
     this.#changeListeners.push(listener);
@@ -24,7 +29,7 @@ export class PointsModel {
       basePrice: orig.base_price,
       dateFrom: orig.date_from,
       dateTo: orig.date_to,
-      destination: DestinationsModel.destinations.find(
+      destination: this.#destinationsModel.destinations.find(
         (dest) => dest.id === orig.destination
       ),
       isFavorite: orig.is_favorite,

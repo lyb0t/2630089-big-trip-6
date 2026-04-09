@@ -6,10 +6,11 @@ import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 
 export default class PointView extends AbstractStatefulView {
-  constructor(point, onEdit, onFavoriteClick) {
+  constructor({ point, offers, onEdit, onFavoriteClick }) {
     super(point);
     this._onEdit = onEdit;
     this._onFavoriteClick = onFavoriteClick;
+    this._offers = offers;
   }
 
   _restoreHandlers() {
@@ -44,6 +45,12 @@ export default class PointView extends AbstractStatefulView {
   get template() {
     const dateFrom = dayjs(this._state.dateFrom);
     const dateTo = dayjs(this._state.dateTo);
+    const offersObj = this._offers.find((off) => off.type === this._state.type);
+    const offers = !offersObj
+      ? []
+      : offersObj.offers.filter((offer) =>
+          this._state.offers.find((off) => off === offer.id)
+        );
     return `
       <li class="trip-events__item">
         <div class="event">
@@ -81,14 +88,20 @@ export default class PointView extends AbstractStatefulView {
           </p>
           <h4 class="visually-hidden">Offers:</h4>
           <ul class="event__selected-offers">
-            ${this._state.offers.map(
-              (offer) =>
-                `<li class="event__offer" data-offer-id="${offer.id}">
+            ${
+              offers.length > 0
+                ? offers
+                    .map(
+                      (offer) =>
+                        `<li class="event__offer" data-offer-id="${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${offer.price}</span>
             </li>`
-            )}
+                    )
+                    .join("")
+                : ""
+            }
           </ul>
           <button class="event__favorite-btn ${
             !this._state.isFavorite ? "" : "event__favorite-btn--active"

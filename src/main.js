@@ -11,14 +11,20 @@ const start = async () => {
   await DestinationsModel.loadDestinations();
   await OffersModel.loadOffers();
 
-  const pointsModel = new PointsModel();
+  const pointsModel = new PointsModel({destinationsModel: DestinationsModel});
   await pointsModel.loadPoints();
 
   const filtersModel = new FiltersModel();
 
   const sortingModel = new SortingModel();
 
-  present(pointsModel, filtersModel, sortingModel);
+  present({
+    pointsModel,
+    filtersModel,
+    sortingModel,
+    destinationsModel: DestinationsModel,
+    offersModel: OffersModel,
+  });
 };
 
 start();

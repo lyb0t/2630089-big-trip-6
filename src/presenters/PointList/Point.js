@@ -6,13 +6,19 @@ import {
 } from "../../framework/render";
 import EditFormView from "../../view/EditForm";
 import PointView from "../../view/Point";
-import DestinationsModel from "../../model/Destinations";
-import OffersModel from "../../model/Offers";
 
 export default class PointPresenter {
   #point = null;
-
-  constructor(point, onOpenEditForm, onSubmit, onDelete) {
+  #destinationsModel = null;
+  #offersModel = null;
+  constructor({
+    destinationsModel,
+    offersModel,
+    point,
+    onOpenEditForm,
+    onSubmit,
+    onDelete,
+  }) {
     if (!point) {
       throw new Error("No point");
     }
@@ -24,6 +30,8 @@ export default class PointPresenter {
     this._onKeyUp = null;
     this._pointView = null;
     this.#point = point;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
   }
 
   toggleFavorite = () => {
@@ -32,18 +40,18 @@ export default class PointPresenter {
 
   openEditForm = () => {
     this._onOpenEditForm();
-    this._editForm = new EditFormView(
-      this.#point,
-      DestinationsModel.destinations,
-      OffersModel.offers,
-      (point) => {
+    this._editForm = new EditFormView({
+      point: this.#point,
+      destinations: this.#destinationsModel.destinations,
+      offers: this.#offersModel.offers,
+      onSubmit: (e, point) => {
         this.closeAndSaveEditForm(point);
       },
-      () => this.closeEditForm(),
-      () => {
+      onReject: () => this.closeEditForm(),
+      onDelete: () => {
         this._onDelete(this.#point.id);
-      }
-    );
+      },
+    });
 
     const close = () => {};
     this._onKeyUp = (e) => {
@@ -62,19 +70,20 @@ export default class PointPresenter {
       return;
     }
     replace(this._pointView, this._editForm);
-    // eslint-disable-next-line no-use-before-define
     document.removeEventListener("keyup", this._onKeyUp);
     this._onKeyUp = null;
     this._editForm = null;
   };
 
   closeAndSaveEditForm = (point) => {
+    console.log("point", point);
     if (!point) {
       throw new Error("no point in closeAndSaveEditForm");
     }
     this.closeEditForm();
     this.#point = point;
     this._onSubmit(point);
+    this._pointView.updateElement(point);
   };
 
   remove() {
@@ -83,11 +92,12 @@ export default class PointPresenter {
 
   present() {
     const contentContainer = document.querySelector(".trip-events");
-    this._pointView = new PointView(
-      this.#point,
-      this.openEditForm,
-      this.toggleFavorite
-    );
+    this._pointView = new PointView({
+      point: this.#point,
+      offers: this.#offersModel.offers,
+      onEdit: this.openEditForm,
+      onFavoriteClick: this.toggleFavorite,
+    });
     render(this._pointView, contentContainer, RenderPosition.BEFOREEND);
   }
 }
