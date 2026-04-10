@@ -30,11 +30,24 @@ export class PointsModel {
       dateFrom: orig.date_from,
       dateTo: orig.date_to,
       destination: this.#destinationsModel.destinations.find(
-        (dest) => dest.id === orig.destination
+        (dest) => dest.id === orig.destination,
       ),
       isFavorite: orig.is_favorite,
       offers: orig.offers,
       type: orig.type,
+    };
+  }
+
+  pointDemapper(point) {
+    return {
+      id: point.id,
+      base_price: Number(point.basePrice),
+      date_from: point.dateFrom,
+      date_to: point.dateTo,
+      destination: point.destination.id,
+      is_favorite: point.isFavorite,
+      offers: point.offers,
+      type: point.type,
     };
   }
 
@@ -51,21 +64,35 @@ export class PointsModel {
     });
 
     if (res.ok) {
-      await this.loadPoints();
+      this.#points = this.#points.filter((p) => p.id !== id);
+      return true;
     }
+    return false;
   }
 
   async updatePoint(point) {
-    const res = await myFetch(API_ROUTES.removePoint(point.id), {
+    const res = await myFetch(API_ROUTES.putPoint(point.id), {
       method: "PUT",
-      body: point,
+      body: this.pointDemapper(point),
     });
 
     if (res.ok) {
-      const result = res.json();
-      this.loadPoints();
+      const result = this.pointMapper(res.body);
+      this.#points = this.#points.map((p) => (p.id === point.id ? result : p));
       return result;
     }
     return null;
   }
 }
+
+export const POINT_TYPES = [
+  "taxi",
+  "bus",
+  "train",
+  "ship",
+  "drive",
+  "flight",
+  "check-in",
+  "sightseeing",
+  "restaurant",
+];

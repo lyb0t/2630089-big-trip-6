@@ -1,14 +1,4 @@
-const POINT_TYPES = [
-  "taxi",
-  "bus",
-  "train",
-  "ship",
-  "drive",
-  "flight",
-  "check-in",
-  "sightseeing",
-  "restaurant",
-];
+
 
 const API_ROUTES = {
   loadPoints: "/points",
@@ -19,4 +9,4 @@ const API_ROUTES = {
   offers: "/offers",
 };
 
-export { POINT_TYPES, API_ROUTES };
+export { API_ROUTES };

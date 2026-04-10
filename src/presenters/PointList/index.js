@@ -20,9 +20,7 @@ export default class PointList {
     this.#sortingModel = sortingModel;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
-    // pointsModel.addChangeListener(() => {
-    //   this.present();
-    // });
+
     filtersModel.addChangeListener(() => {
       this.#sortingModel.sortType = "day";
       this.present();
@@ -32,8 +30,19 @@ export default class PointList {
     });
   }
 
-  removePointPresenters() {
+  _removePointPresenter(id) {
+    this.#pointsPresenters = this.#pointsPresenters.filter((pr) => {
+      if (pr.id === id) {
+        pr.remove();
+        return false;
+      }
+      return true;
+    });
+  }
+
+  _removePointPresenters() {
     this.#pointsPresenters.forEach((presenter) => presenter.remove());
+    this.#pointsPresenters = [];
   }
 
   closeAllForms() {
@@ -42,21 +51,12 @@ export default class PointList {
     });
   }
 
-  presentPoint(id) {
-    const pr = this.#pointsPresenters.find((p) => p.id === id);
-    if (!pr) {
-      console.warn(`PointPresenter with id=${id} not found`);
-      return;
-    }
-    pr.present();
-  }
-
   present() {
     console.log("PointList present");
     this.closeAllForms();
-    this.removePointPresenters();
+    this._removePointPresenters();
     const filteredPoints = this.#filtersModel.filterPoints(
-      this.#pointsModel.points
+      this.#pointsModel.points,
     );
 
     const sortedPoints = this.#sortingModel.sortPoints(filteredPoints);
@@ -68,17 +68,23 @@ export default class PointList {
           offersModel: this.#offersModel,
           point,
           onOpenEditForm: () => this.closeAllForms(),
-          onSubmit: (newPoint) => {
-            this.#pointsModel.points = this.#pointsModel.points.map((val) =>
-              val.id === newPoint.id ? newPoint : val
-            );
-            // this.present();
+          onSubmit: async (newPoint) => {
+            const result = await this.#pointsModel.updatePoint(newPoint);
+            if (result) {
+              this.#pointsPresenters.forEach((pr) => {
+                if (pr.id === result.id) {
+                  pr.updatePoint(result);
+                }
+              });
+            }
           },
-          onDelete: () => {
-            this.closeAllForms();
-            this.#pointsModel.removePoint(point.id);
+          onDelete: async (id) => {
+            const result = await this.#pointsModel.removePoint(id);
+            if (result) {
+              this._removePointPresenter(id);
+            }
           },
-        })
+        }),
     );
     this.#pointsPresenters.forEach((presenter) => presenter.present());
   }

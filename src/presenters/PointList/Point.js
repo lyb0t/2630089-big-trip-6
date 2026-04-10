@@ -73,21 +73,30 @@ export default class PointPresenter {
     document.removeEventListener("keyup", this._onKeyUp);
     this._onKeyUp = null;
     this._editForm = null;
+    console.log(this._pointView);
   };
 
-  closeAndSaveEditForm = (point) => {
+  closeAndSaveEditForm = async (point) => {
     console.log("point", point);
     if (!point) {
       throw new Error("no point in closeAndSaveEditForm");
     }
     this.closeEditForm();
-    this.#point = point;
-    this._onSubmit(point);
-    this._pointView.updateElement(point);
+    const res = await this._onSubmit(point);
+    if (res) {
+      this.#point = point;
+      this._pointView.updateElement(point);
+    }
   };
 
   remove() {
     remove(this._pointView);
+    remove(this._editForm);
+  }
+
+  updatePoint(point) {
+    this.#point = point;
+    this._pointView.updateElement(point);
   }
 
   present() {
@@ -98,6 +107,7 @@ export default class PointPresenter {
       onEdit: this.openEditForm,
       onFavoriteClick: this.toggleFavorite,
     });
+    console.log(this._pointView);
     render(this._pointView, contentContainer, RenderPosition.BEFOREEND);
   }
 }

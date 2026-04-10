@@ -14,14 +14,15 @@ async function myFetch(path, init) {
   const fullURL = new URL(baseURL + path).href;
   const res = await fetch(fullURL, {
     method: "GET",
-    body: init?.body ? JSON.stringify(init.body) : undefined,
     ...init,
+    body: init?.body ? JSON.stringify(init.body) : undefined,
     headers: {
       Authorization: process.env.AUTH_TOKEN,
+      "Content-Type": "application/json",
       ...init?.headers,
     },
   });
-
+  
   const result = {
     ok: res.ok,
     status: res.status,

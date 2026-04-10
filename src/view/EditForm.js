@@ -2,6 +2,7 @@ import flatpickr from "flatpickr";
 import AbstractStatefulView from "../framework/view/abstract-stateful-view";
 import { capitalizeFirstLetter } from "../utils";
 import "flatpickr/dist/flatpickr.min.css";
+import { POINT_TYPES } from "../model/Points";
 
 export default class EditFormView extends AbstractStatefulView {
   #datePickerFrom = "";
@@ -32,20 +33,20 @@ export default class EditFormView extends AbstractStatefulView {
 
   _toggleOffer(id) {
     const offers = this._state.offers;
-    const offerIndex = offers.indexOf((off) => off.id === id);
-    console.log("offers", offers);
-    if (offerIndex === -1) {
-      this._state = {
-        ...this._state,
-        offers: Array.from([...this._state.offers, id]),
-      };
+    console.log("old offers", offers);
+    const isOffer = offers.includes(id);
+    console.log(isOffer);
+    if (isOffer) {
+      this._setState({
+        offers: this._state.offers.filter((off) => off !== id),
+      });
     } else {
-      this._state = {
+      this._setState({
         ...this._state,
-        offers: Array.from(this._state.offers.filter((off) => off.id !== id)),
-      };
+        offers: [...this._state.offers, id],
+      });
     }
-    console.log("offers choosed", this._state.offers);
+    console.log("new offers", this._state.offers);
   }
 
   _destroyDatePickers() {
@@ -113,6 +114,7 @@ export default class EditFormView extends AbstractStatefulView {
     this.element
       .querySelector(".event__type-group")
       .addEventListener("change", (e) => {
+        this._setState({ offers: [] });
         this.updateElement({
           type: e.target.value,
         });
@@ -133,11 +135,22 @@ export default class EditFormView extends AbstractStatefulView {
         }
       });
 
-    this.element.querySelectorAll(".event__offer-selector").forEach((el) =>
+    this.element.querySelectorAll(".event__offer-selector").forEach((el) => {
       el.addEventListener("click", (e) => {
+        e.preventDefault();
+        const checkbox = el.querySelector("input.event__offer-checkbox");
+        checkbox.checked = !checkbox.checked;
         this._toggleOffer(e.currentTarget.getAttribute("data-offer-id"));
-      })
-    );
+      });
+    });
+
+    this.element
+      .querySelector(".event__input--price")
+      .addEventListener("change", (e) => {
+        this._setState({
+          basePrice: e.target.value,
+        });
+      });
 
     this._initDatePickers();
   }
@@ -157,7 +170,7 @@ export default class EditFormView extends AbstractStatefulView {
   get template() {
     const destination = this._state.destination;
     const offersObj = this.#offers.find(
-      (offer) => offer.type === this._state.type
+      (offer) => offer.type === this._state.type,
     );
     const offers = offersObj ? offersObj.offers : [];
     return `
@@ -175,51 +188,14 @@ export default class EditFormView extends AbstractStatefulView {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-
-                <div class="event__type-item">
-                  <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-                  <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-                  <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-                  <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-                  <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-                  <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-                  <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-                  <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-                  <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-                  <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-                </div>
+                ${POINT_TYPES.map(
+                  (type) => `
+                    <div class="event__type-item">
+                        <input id="event-type-${type}-1" ${this._state.type === type ? "checked" : ""} class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
+                        <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${capitalizeFirstLetter(type)}</label>
+                    </div>
+                    `,
+                ).join("")}
               </fieldset>
             </div>
           </div>
@@ -276,14 +252,14 @@ export default class EditFormView extends AbstractStatefulView {
                 .map(
                   (offer) => `
                 <div class="event__offer-selector" data-offer-id="${offer.id}">
-                  <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" checked>
+                  <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" ${this._state.offers.includes(offer.id) ? "checked" : ""}>
                   <label class="event__offer-label" for="${offer.id}">
                     <span class="event__offer-title">${offer.title}</span>
                     &plus;&euro;&nbsp;
                     <span class="event__offer-price">${offer.price}</span>
                   </label>
                 </div>
-                `
+                `,
                 )
                 .join("")}
             </div>
@@ -316,7 +292,7 @@ export default class EditFormView extends AbstractStatefulView {
                   <div class="event__photos-tape">
                     ${destination.pictures.map(
                       (pic) =>
-                        `<img class="event__photo" src="${pic.src}" alt="${pic.description}">`
+                        `<img class="event__photo" src="${pic.src}" alt="${pic.description}">`,
                     )}
                   </div>
                 </div>
