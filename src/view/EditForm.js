@@ -3,6 +3,7 @@ import AbstractStatefulView from "../framework/view/abstract-stateful-view";
 import { capitalizeFirstLetter } from "../utils";
 import "flatpickr/dist/flatpickr.min.css";
 import { POINT_TYPES } from "../model/Points";
+import UiBlocker from "../framework/ui-blocker/ui-blocker";
 
 export default class EditFormView extends AbstractStatefulView {
   #datePickerFrom = "";
@@ -12,6 +13,8 @@ export default class EditFormView extends AbstractStatefulView {
   #onSubmit = () => {};
   #onReject = () => {};
   #onDelete = () => {};
+
+  #uiBlocker = () => {};
   constructor({
     point,
     destinations,
@@ -29,6 +32,8 @@ export default class EditFormView extends AbstractStatefulView {
     this.#onSubmit = onSubmit;
     this.#onReject = onReject;
     this.#onDelete = onDelete;
+
+    this.#uiBlocker = new UiBlocker(0, 0);
   }
 
   _toggleOffer(id) {
@@ -93,10 +98,20 @@ export default class EditFormView extends AbstractStatefulView {
 
   _restoreHandlers() {
     this._destroyDatePickers();
-    this.element.addEventListener("submit", (e) => {
-      e.preventDefault();
-      this.#onSubmit(e, this._state);
-    });
+    this.element
+      .querySelector(".event__save-btn")
+      .addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.target.textContent = "Saving...";
+        this.#uiBlocker.block();
+        const result = await this.#onSubmit(e, this._state);
+        e.target.textContent = "Save";
+        this.#uiBlocker.unblock();
+
+        if (!result) {
+          this.shake();
+        }
+      });
     this.element
       .querySelector(".event__rollup-btn")
       .addEventListener("click", (e) => {
@@ -106,9 +121,17 @@ export default class EditFormView extends AbstractStatefulView {
 
     this.element
       .querySelector(".event__reset-btn")
-      .addEventListener("click", (e) => {
+      .addEventListener("click", async (e) => {
         e.preventDefault();
-        this.#onDelete();
+        e.target.textContent = "Deleting...";
+        this.#uiBlocker.block();
+        const result = await this.#onDelete();
+        e.target.textContent = "Delete";
+        this.#uiBlocker.unblock();
+
+        if (!result) {
+          this.shake();
+        }
       });
 
     this.element

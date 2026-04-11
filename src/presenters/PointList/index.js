@@ -21,6 +21,9 @@ export default class PointList {
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
 
+    pointsModel.addChangeListener(() => {
+      this.present();
+    });
     filtersModel.addChangeListener(() => {
       this.#sortingModel.sortType = "day";
       this.present();
@@ -68,22 +71,9 @@ export default class PointList {
           offersModel: this.#offersModel,
           point,
           onOpenEditForm: () => this.closeAllForms(),
-          onSubmit: async (newPoint) => {
-            const result = await this.#pointsModel.updatePoint(newPoint);
-            if (result) {
-              this.#pointsPresenters.forEach((pr) => {
-                if (pr.id === result.id) {
-                  pr.updatePoint(result);
-                }
-              });
-            }
-          },
-          onDelete: async (id) => {
-            const result = await this.#pointsModel.removePoint(id);
-            if (result) {
-              this._removePointPresenter(id);
-            }
-          },
+          onSubmit: async (newPoint) =>
+            await this.#pointsModel.updatePoint(newPoint),
+          onDelete: async (id) => await this.#pointsModel.removePoint(id),
         }),
     );
     this.#pointsPresenters.forEach((presenter) => presenter.present());

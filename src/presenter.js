@@ -1,3 +1,4 @@
+import CreateEventPresenter from "./presenters/CreateEvent";
 import FiltersPresenter from "./presenters/Filters";
 import PointListPresenter from "./presenters/PointList";
 import SortingPresenter from "./presenters/Sorting";
@@ -23,4 +24,12 @@ export default function present({
     offersModel,
   });
   pointListPresenter.present();
+
+  const createEventPresenter = new CreateEventPresenter({
+    pointsModel,
+    destinationsModel,
+    offersModel,
+    addBtnSelector: ".trip-main__event-add-btn",
+  });
+  createEventPresenter.present();
 }

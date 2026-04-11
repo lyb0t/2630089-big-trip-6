@@ -64,10 +64,24 @@ export class PointsModel {
     });
 
     if (res.ok) {
-      this.#points = this.#points.filter((p) => p.id !== id);
+      this.points = this.#points.filter((p) => p.id !== id);
       return true;
     }
     return false;
+  }
+
+  async addPoint(point) {
+    const res = await myFetch(API_ROUTES.postPoint, {
+      method: "POST",
+      body: this.pointDemapper(point),
+    });
+
+    if (res.ok) {
+      const result = this.pointMapper(res.body);
+      this.points = [...this.#points, result];
+      return result;
+    }
+    return null;
   }
 
   async updatePoint(point) {
@@ -78,7 +92,7 @@ export class PointsModel {
 
     if (res.ok) {
       const result = this.pointMapper(res.body);
-      this.#points = this.#points.map((p) => (p.id === point.id ? result : p));
+      this.points = this.#points.map((p) => (p.id === point.id ? result : p));
       return result;
     }
     return null;

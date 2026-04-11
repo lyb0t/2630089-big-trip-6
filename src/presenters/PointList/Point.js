@@ -44,13 +44,9 @@ export default class PointPresenter {
       point: this.#point,
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
-      onSubmit: (e, point) => {
-        this.closeAndSaveEditForm(point);
-      },
+      onSubmit: async (e, point) => await this.closeAndSaveEditForm(point),
       onReject: () => this.closeEditForm(),
-      onDelete: () => {
-        this._onDelete(this.#point.id);
-      },
+      onDelete: async () => await this._onDelete(this.#point.id),
     });
 
     const close = () => {};
@@ -100,6 +96,7 @@ export default class PointPresenter {
   }
 
   present() {
+    console.log(this.#point);
     const contentContainer = document.querySelector(".trip-events");
     this._pointView = new PointView({
       point: this.#point,
