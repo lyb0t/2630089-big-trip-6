@@ -16,13 +16,18 @@ export default class PointView extends AbstractStatefulView {
   _restoreHandlers() {
     const editBtn = this.element.querySelector(".event__rollup-btn");
     editBtn.addEventListener("click", (e) =>
-      this._onEdit(e, this, this.element)
+      this._onEdit(e, this, this.element),
     );
 
     const favBtn = this.element.querySelector(".event__favorite-btn");
-    favBtn.addEventListener("click", (e) => {
-      this._onFavoriteClick(e, this, this.element);
-      this.updateElement({ isFavorite: !this._state.isFavorite });
+    favBtn.addEventListener("click", async (e) => {
+      const result = await this._onFavoriteClick(e, this, this.element);
+      console.log(result);
+      if (result) {
+        this.updateElement({ isFavorite: !this._state.isFavorite });
+      } else {
+        this.shake();
+      }
     });
   }
 
@@ -34,11 +39,11 @@ export default class PointView extends AbstractStatefulView {
     const minutes = dur.minutes();
 
     if (days > 0) {
-      return `${days}D ${hours}H ${minutes}M`;
+      return `${String(days).padStart(2, "0")}D ${String(hours).padStart(2, "0")}H ${String(minutes).padStart(2, "0")}M`;
     } else if (hours > 0) {
-      return `${hours}H ${minutes}M`;
+      return `${String(hours).padStart(2, "0")}H ${String(minutes).padStart(2, "0")}M`;
     } else {
-      return `${minutes}M`;
+      return `${String(minutes).padStart(2, "0")}M`;
     }
   }
 
@@ -49,7 +54,7 @@ export default class PointView extends AbstractStatefulView {
     const offers = !offersObj
       ? []
       : offersObj.offers.filter((offer) =>
-          this._state.offers.find((off) => off === offer.id)
+          this._state.offers.find((off) => off === offer.id),
         );
     return `
       <li class="trip-events__item">
@@ -63,7 +68,7 @@ export default class PointView extends AbstractStatefulView {
             }.png" alt="Event type icon">
           </div>
           <h3 class="event__title">${capitalizeFirstLetter(
-            this._state.type
+            this._state.type,
           )}</h3>
           <div class="event__schedule">
             <p class="event__time">
@@ -97,7 +102,7 @@ export default class PointView extends AbstractStatefulView {
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${offer.price}</span>
-            </li>`
+            </li>`,
                     )
                     .join("")
                 : ""

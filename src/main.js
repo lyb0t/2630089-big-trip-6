@@ -10,14 +10,9 @@ import { SortingModel } from "./model/Sorting";
 const start = async () => {
   await DestinationsModel.loadDestinations();
   await OffersModel.loadOffers();
-
-  const pointsModel = new PointsModel({destinationsModel: DestinationsModel});
-  await pointsModel.loadPoints();
-
+  const pointsModel = new PointsModel({ destinationsModel: DestinationsModel });
   const filtersModel = new FiltersModel();
-
   const sortingModel = new SortingModel();
-
   present({
     pointsModel,
     filtersModel,
@@ -25,6 +20,8 @@ const start = async () => {
     destinationsModel: DestinationsModel,
     offersModel: OffersModel,
   });
+
+  await pointsModel.loadPoints();
 };
 
 start();

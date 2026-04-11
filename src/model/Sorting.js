@@ -1,13 +1,13 @@
 const sortFuncs = {
   day: (points) =>
-    [...points].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom)),
+    [...points].sort((a, b) => new Date(b.dateFrom) - new Date(a.dateFrom)),
   time: (points) =>
     [...points].sort((a, b) => {
       const durationA = new Date(a.dateTo) - new Date(a.dateFrom);
       const durationB = new Date(b.dateTo) - new Date(b.dateFrom);
-      return durationA - durationB;
+      return durationB - durationA;
     }),
-  price: (points) => [...points].sort((a, b) => a.basePrice - b.basePrice),
+  price: (points) => [...points].sort((a, b) => b.basePrice - a.basePrice),
 };
 
 export class SortingModel {

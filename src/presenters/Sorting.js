@@ -3,11 +3,19 @@ import SortingView from "../view/Sorting";
 
 export default class SortingPresenter {
   #sortingModel = null;
+  #pointsModel = null;
   #sortingView = null;
-  constructor({sortingModel}) {
+  constructor({ pointsModel, sortingModel }) {
+    this.#pointsModel = pointsModel;
     this.#sortingModel = sortingModel;
     this.#sortingModel.addChangeListener((newSortType) => {
       this.#sortingView.changeSelectedSort(newSortType);
+    });
+
+    this.#pointsModel.addLoadListener((result) => {
+      if (result) {
+        this.present();
+      }
     });
   }
 

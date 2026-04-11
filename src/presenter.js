@@ -10,11 +10,9 @@ export default function present({
   destinationsModel,
   offersModel,
 }) {
-  const filtersPresenter = new FiltersPresenter({ filtersModel, sortingModel });
-  filtersPresenter.present();
+  const filtersPresenter = new FiltersPresenter({ pointsModel, filtersModel, sortingModel });
 
-  const sortingPresenter = new SortingPresenter({ sortingModel });
-  sortingPresenter.present();
+  const sortingPresenter = new SortingPresenter({ pointsModel, sortingModel });
 
   const pointListPresenter = new PointListPresenter({
     pointsModel,
@@ -23,13 +21,17 @@ export default function present({
     destinationsModel,
     offersModel,
   });
-  pointListPresenter.present();
 
   const createEventPresenter = new CreateEventPresenter({
     pointsModel,
     destinationsModel,
     offersModel,
+    filtersModel,
+    sortingModel,
     addBtnSelector: ".trip-main__event-add-btn",
+    onOpen: () => pointListPresenter.closeAllForms(),
   });
-  createEventPresenter.present();
+  pointListPresenter.setCloseCreationForm(() =>
+    createEventPresenter.removeEditForm(),
+  );
 }

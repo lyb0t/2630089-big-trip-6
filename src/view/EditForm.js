@@ -4,6 +4,7 @@ import { capitalizeFirstLetter } from "../utils";
 import "flatpickr/dist/flatpickr.min.css";
 import { POINT_TYPES } from "../model/Points";
 import UiBlocker from "../framework/ui-blocker/ui-blocker";
+import { remove } from "../framework/render";
 
 export default class EditFormView extends AbstractStatefulView {
   #datePickerFrom = "";
@@ -12,7 +13,7 @@ export default class EditFormView extends AbstractStatefulView {
   #offers = [];
   #onSubmit = () => {};
   #onReject = () => {};
-  #onDelete = () => {};
+  #onDelete = null;
 
   #uiBlocker = () => {};
   constructor({
@@ -21,7 +22,7 @@ export default class EditFormView extends AbstractStatefulView {
     offers,
     onSubmit = () => {},
     onReject = () => {},
-    onDelete = () => {},
+    onDelete,
   }) {
     super(point);
 
@@ -112,19 +113,22 @@ export default class EditFormView extends AbstractStatefulView {
           this.shake();
         }
       });
-    this.element
-      .querySelector(".event__rollup-btn")
-      .addEventListener("click", (e) => {
+
+    const rollup = this.element.querySelector(".event__rollup-btn");
+    if (rollup) {
+      rollup.addEventListener("click", (e) => {
         e.preventDefault();
         this.#onReject();
       });
+    }
 
-    this.element
-      .querySelector(".event__reset-btn")
-      .addEventListener("click", async (e) => {
+    const resetBtn = this.element.querySelector(".delete-btn");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", async (e) => {
         e.preventDefault();
         e.target.textContent = "Deleting...";
         this.#uiBlocker.block();
+
         const result = await this.#onDelete();
         e.target.textContent = "Delete";
         this.#uiBlocker.unblock();
@@ -133,6 +137,12 @@ export default class EditFormView extends AbstractStatefulView {
           this.shake();
         }
       });
+    }
+
+    const cancelBtn = this.element.querySelector(".cancel-btn");
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", this.#onReject);
+    }
 
     this.element
       .querySelector(".event__type-group")
@@ -175,6 +185,14 @@ export default class EditFormView extends AbstractStatefulView {
         });
       });
 
+    this._escHandler = (e) => {
+      console.log("keyup");
+      if (e.key === "Escape") {
+        this.#onReject(e);
+      }
+    };
+    document.addEventListener("keyup", this._escHandler);
+
     this._initDatePickers();
   }
 
@@ -188,6 +206,11 @@ export default class EditFormView extends AbstractStatefulView {
 
   _findOfferById(id) {
     return this.#destinations.find((dest) => dest.id === id);
+  }
+
+  remove() {
+    document.removeEventListener("keyup", this._escHandler);
+    remove(this);
   }
 
   get template() {
@@ -256,10 +279,19 @@ export default class EditFormView extends AbstractStatefulView {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
+          
+          ${
+            this.#onDelete
+              ? `<button class="event__reset-btn delete-btn" type="reset">Delete</button>`
+              : `<button class="event__reset-btn cancel-btn">Cancel</button>`
+          }
+          ${
+            this.#onDelete
+              ? `<button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
-          </button>
+          </button>`
+              : ""
+          }
         </header>
         <section class="event__details">
         ${

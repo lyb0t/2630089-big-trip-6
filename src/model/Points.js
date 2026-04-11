@@ -5,6 +5,7 @@ export class PointsModel {
   #points = [];
   #destinationsModel = null;
   #changeListeners = [];
+  #loadListeners = [];
 
   constructor({ destinationsModel }) {
     this.#destinationsModel = destinationsModel;
@@ -14,13 +15,26 @@ export class PointsModel {
     this.#changeListeners.push(listener);
   }
 
+  addLoadListener(listener) {
+    this.#loadListeners.push(listener);
+  }
+
+  fireLoadListeners(result) {
+    console.log('fireLoadLis')
+    this.#loadListeners.forEach((listener) => listener(result));
+  }
+
+  fireChangeListeners(newPoints) {
+    this.#changeListeners.forEach((listener) => listener(newPoints));
+  }
+
   get points() {
     return this.#points;
   }
 
   set points(newPoints) {
     this.#points = newPoints;
-    this.#changeListeners.forEach((listener) => listener(newPoints));
+    this.fireChangeListeners(newPoints);
   }
 
   pointMapper(orig) {
@@ -55,6 +69,9 @@ export class PointsModel {
     const res = await myFetch(API_ROUTES.loadPoints);
     if (res.ok) {
       this.points = res.body.map((point) => this.pointMapper(point));
+      this.fireLoadListeners(true);
+    } else {
+      this.fireLoadListeners(false);
     }
   }
 

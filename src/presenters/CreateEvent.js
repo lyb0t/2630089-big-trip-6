@@ -4,21 +4,45 @@ import EditFormView from "../view/EditForm";
 export default class CreateEventPresenter {
   #pointsModel = null;
   #destinationsModel = null;
+  #filtersModel = null;
+  #sortingModel = null;
   #offersModel = null;
   #editFormView = null;
   #addBtnSelector = null;
-  constructor({ pointsModel, destinationsModel, offersModel, addBtnSelector }) {
+  #onOpen = () => {};
+  constructor({
+    pointsModel,
+    destinationsModel,
+    offersModel,
+    filtersModel,
+    sortingModel,
+    addBtnSelector,
+    onOpen = () => {},
+  }) {
     this.#pointsModel = pointsModel;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
+    this.#filtersModel = filtersModel;
+    this.#sortingModel = sortingModel;
     this.#addBtnSelector = addBtnSelector;
+    this.#onOpen = onOpen;
+
+    this.#pointsModel.addLoadListener((result) => {
+      if (!result) {
+        document
+          .querySelector(this.#addBtnSelector)
+          .setAttribute("disabled", "true");
+      }
+    });
+
+    this.present();
   }
 
   removeEditForm() {
     if (!this.#editFormView) {
       return;
     }
-    remove(this.#editFormView);
+    this.#editFormView.remove();
     this.#editFormView = null;
   }
 
@@ -26,16 +50,24 @@ export default class CreateEventPresenter {
     if (this.#editFormView) {
       return;
     }
+    this.#onOpen();
+    this.#filtersModel.filter = "everything";
+    console.log(this.#filtersModel.filter);
+    this.#sortingModel.sortType = "day";
     this.#editFormView = new EditFormView({
       point: {
         id: "",
-        basePrice: 1000,
-        dateFrom: new Date().toISOString(),
-        dateTo: new Date(Date.now() + 86400000).toISOString(),
-        destination: this.#destinationsModel.destinations[0],
+        basePrice: 0,
+        dateFrom: "",
+        dateTo: "",
+        // dateFrom: new Date().toISOString(),
+        // dateTo: new Date(Date.now() + 86400000).toISOString(),
+        destination: {
+          name: "",
+        },
         isFavorite: false,
         offers: [],
-        type: "taxi",
+        type: "flight",
       },
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
@@ -48,7 +80,6 @@ export default class CreateEventPresenter {
         }
       },
       onReject: () => this.removeEditForm(),
-      onDelete: () => this.removeEditForm(),
     });
     const contentContainer = document.querySelector(".trip-events__trip-sort");
     render(this.#editFormView, contentContainer, RenderPosition.AFTEREND);
@@ -56,6 +87,12 @@ export default class CreateEventPresenter {
 
   present() {
     const addBtn = document.querySelector(this.#addBtnSelector);
-    addBtn.addEventListener("click", () => this.presentEditForm());
+    addBtn.addEventListener("click", () => {
+      if (this.#editFormView) {
+        this.removeEditForm();
+      } else {
+        this.presentEditForm();
+      }
+    });
   }
 }

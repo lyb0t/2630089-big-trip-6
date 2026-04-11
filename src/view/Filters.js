@@ -14,6 +14,27 @@ export default class FiltersView extends AbstractView {
     });
   }
 
+  changeFilter(newFilter) {
+    const inputs = this.element.querySelectorAll(
+      "input.trip-filters__filter-input",
+    );
+    inputs.forEach((input) =>
+      input.id === `filter-${newFilter}`
+        ? (input.checked = true)
+        : (input.checked = false),
+    );
+  }
+
+  disable() {
+    const inputs = this.element.querySelectorAll(
+      "input.trip-filters__filter-input",
+    );
+    inputs.forEach((input) => {
+      input.setAttribute("disabled", "true");
+      input.checked = false;
+    });
+  }
+
   get template() {
     return `
       <form class="trip-filters" action="#" method="get">

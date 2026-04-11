@@ -27,15 +27,17 @@ export default class PointPresenter {
     this._onSubmit = onSubmit;
     this._onDelete = onDelete;
     this._editForm = null;
-    this._onKeyUp = null;
     this._pointView = null;
     this.#point = point;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
   }
 
-  toggleFavorite = () => {
-    this.#point.isFavorite = !this.#point.isFavorite;
+  _toggleFavorite = async () => {
+    // this.#point.isFavorite = !this.#point.isFavorite;
+    const newPoint = structuredClone(this.#point);
+    newPoint.isFavorite = !newPoint.isFavorite;
+    return await this._onSubmit(newPoint);
   };
 
   openEditForm = () => {
@@ -49,15 +51,6 @@ export default class PointPresenter {
       onDelete: async () => await this._onDelete(this.#point.id),
     });
 
-    const close = () => {};
-    this._onKeyUp = (e) => {
-      if (e.key === "Escape") {
-        // eslint-disable-next-line no-use-before-define
-        close(this._editForm);
-      }
-    };
-    document.addEventListener("keyup", this._onKeyUp);
-
     replace(this._editForm, this._pointView);
   };
 
@@ -66,28 +59,22 @@ export default class PointPresenter {
       return;
     }
     replace(this._pointView, this._editForm);
-    document.removeEventListener("keyup", this._onKeyUp);
-    this._onKeyUp = null;
+    this._editForm.remove();
     this._editForm = null;
-    console.log(this._pointView);
   };
 
   closeAndSaveEditForm = async (point) => {
-    console.log("point", point);
     if (!point) {
       throw new Error("no point in closeAndSaveEditForm");
     }
-    this.closeEditForm();
-    const res = await this._onSubmit(point);
-    if (res) {
-      this.#point = point;
-      this._pointView.updateElement(point);
-    }
+    await this._onSubmit(point);
   };
 
   remove() {
     remove(this._pointView);
-    remove(this._editForm);
+    if (this._editForm) {
+      this._editForm.remove();
+    }
   }
 
   updatePoint(point) {
@@ -96,15 +83,16 @@ export default class PointPresenter {
   }
 
   present() {
-    console.log(this.#point);
+    console.log("this.#point", this.#point);
     const contentContainer = document.querySelector(".trip-events");
+
     this._pointView = new PointView({
       point: this.#point,
       offers: this.#offersModel.offers,
       onEdit: this.openEditForm,
-      onFavoriteClick: this.toggleFavorite,
+      onFavoriteClick: async () => await this._toggleFavorite(),
     });
-    console.log(this._pointView);
+
     render(this._pointView, contentContainer, RenderPosition.BEFOREEND);
   }
 }
