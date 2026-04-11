@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
@@ -34,8 +35,9 @@ async function myFetch(path, init) {
     if (res.body) {
       result.body = await res.json();
     }
-  } catch (error) {}
-
+    // eslint-disable-next-line no-empty
+  } finally {
+  }
   return result;
 }
 

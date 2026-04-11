@@ -214,8 +214,8 @@ export default class EditFormView extends AbstractStatefulView {
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${
-                this._state.type
-              }.png" alt="Event type icon">
+  this._state.type
+}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -223,13 +223,13 @@ export default class EditFormView extends AbstractStatefulView {
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
                 ${POINT_TYPES.map(
-                  (type) => `
+    (type) => `
                     <div class="event__type-item">
                         <input id="event-type-${type}-1" ${this._state.type === type ? "checked" : ""} class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
                         <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${capitalizeFirstLetter(type)}</label>
                     </div>
                     `,
-                ).join("")}
+  ).join("")}
               </fieldset>
             </div>
           </div>
@@ -239,12 +239,12 @@ export default class EditFormView extends AbstractStatefulView {
               ${capitalizeFirstLetter(this._state.type)}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${
-              this._state.destination.name
-            }" list="destination-list-1">
+  this._state.destination.name
+}" list="destination-list-1">
             <datalist id="destination-list-1">
             ${this.#destinations
-              .map((dest) => `<option value="${dest.name}"></option>`)
-              .join("")}
+    .map((dest) => `<option value="${dest.name}"></option>`)
+    .join("")}
             </datalist>
           </div>
 
@@ -262,29 +262,29 @@ export default class EditFormView extends AbstractStatefulView {
               &euro;
             </label>
             <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${
-              this._state.basePrice
-            }">
+  this._state.basePrice
+}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           
           ${
-            this.#onDelete
-              ? `<button class="event__reset-btn delete-btn" type="reset">Delete</button>`
-              : `<button class="event__reset-btn cancel-btn">Cancel</button>`
-          }
+  this.#onDelete
+    ? "<button class=\"event__reset-btn delete-btn\" type=\"reset\">Delete</button>"
+    : "<button class=\"event__reset-btn cancel-btn\">Cancel</button>"
+}
           ${
-            this.#onDelete
-              ? `<button class="event__rollup-btn" type="button">
+  this.#onDelete
+    ? `<button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
           </button>`
-              : ""
-          }
+    : ""
+}
         </header>
         <section class="event__details">
         ${
-          offers.length > 0
-            ? `
+  offers.length > 0
+    ? `
           <section class="event__section  event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">
                   Offers
@@ -292,8 +292,8 @@ export default class EditFormView extends AbstractStatefulView {
             
             <div class="event__available-offers">
               ${offers
-                .map(
-                  (offer) => `
+    .map(
+      (offer) => `
                 <div class="event__offer-selector" data-offer-id="${offer.id}">
                   <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" ${this._state.offers.includes(offer.id) ? "checked" : ""}>
                   <label class="event__offer-label" for="${offer.id}">
@@ -303,47 +303,47 @@ export default class EditFormView extends AbstractStatefulView {
                   </label>
                 </div>
                 `,
-                )
-                .join("")}
+    )
+    .join("")}
             </div>
           </section>`
-            : ""
-        }
+    : ""
+}
           ${
-            !destination
-              ? ""
-              : `
+  !destination
+    ? ""
+    : `
             <section class="event__section  event__section--destination">
               ${
-                destination.description
-                  ? `<h3 class="event__section-title  event__section-title--destination">Destination</h3>`
-                  : ""
-              }
+  destination.description
+    ? "<h3 class=\"event__section-title  event__section-title--destination\">Destination</h3>"
+    : ""
+}
               ${
-                destination.description
-                  ? `<p class="event__destination-description">
+  destination.description
+    ? `<p class="event__destination-description">
                     ${destination.description}
                   </p>`
-                  : ""
-              }
+    : ""
+}
 
               ${
-                !(destination.pictures?.length > 0)
-                  ? ""
-                  : `
+  !(destination.pictures?.length > 0)
+    ? ""
+    : `
                 <div class="event__photos-container">
                   <div class="event__photos-tape">
                     ${destination.pictures.map(
-                      (pic) =>
-                        `<img class="event__photo" src="${pic.src}" alt="${pic.description}">`,
-                    )}
+    (pic) =>
+      `<img class="event__photo" src="${pic.src}" alt="${pic.description}">`,
+  )}
                   </div>
                 </div>
               `
-              }
+}
             </section>
             `
-          }
+}
           
         </section>
       </form>

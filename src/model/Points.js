@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { API_ROUTES } from "../const";
 import { myFetch } from "../utils";
 

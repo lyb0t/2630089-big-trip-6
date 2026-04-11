@@ -11,15 +11,15 @@ export default function present({
   destinationsModel,
   offersModel,
 }) {
-  const filtersPresenter = new FiltersPresenter({
+  new FiltersPresenter({
     pointsModel,
     filtersModel,
     sortingModel,
   });
 
-  const sortingPresenter = new SortingPresenter({ pointsModel, sortingModel });
+  new SortingPresenter({ pointsModel, sortingModel });
 
-  const tripInfoPresenter = new TripInfoPresenter({ pointsModel, offersModel, sortingModel });
+  new TripInfoPresenter({ pointsModel, offersModel, sortingModel });
 
   const pointListPresenter = new PointListPresenter({
     pointsModel,

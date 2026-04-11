@@ -108,18 +108,18 @@ export default class PointList {
     if (sortedPoints.length === 0) {
       let msg = null;
       switch (this.#filtersModel.filter) {
-        case "everything":
-          msg = "Click New Event to create your first point";
-          break;
-        case "past":
-          msg = "There are no past events now";
-          break;
-        case "present":
-          msg = "There are no present events now";
-          break;
-        case "future":
-          msg = "There are no future events now";
-          break;
+      case "everything":
+        msg = "Click New Event to create your first point";
+        break;
+      case "past":
+        msg = "There are no past events now";
+        break;
+      case "present":
+        msg = "There are no present events now";
+        break;
+      case "future":
+        msg = "There are no future events now";
+        break;
       }
       this.#bigMsgView = new BigMsgView(msg);
       const contentContainer = document.querySelector(".trip-events");

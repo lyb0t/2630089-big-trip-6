@@ -1,4 +1,4 @@
-import './ui-blocker.css';
+import "./ui-blocker.css";
 
 /**
  * Класс для блокировки интерфейса
@@ -31,8 +31,8 @@ export default class UiBlocker {
     this.#lowerLimit = lowerLimit;
     this.#upperLimit = upperLimit;
 
-    this.#element = document.createElement('div');
-    this.#element.classList.add('ui-blocker');
+    this.#element = document.createElement("div");
+    this.#element.classList.add("ui-blocker");
     document.body.append(this.#element);
   }
 
@@ -64,14 +64,14 @@ export default class UiBlocker {
 
   /** Метод, добавляющий CSS-класс и обработчик */
   #activateBlocking = () => {
-    this.#element.classList.add('ui-blocker--on');
-    document.addEventListener('keydown', this.#documentKeydownHandler);
+    this.#element.classList.add("ui-blocker--on");
+    document.addEventListener("keydown", this.#documentKeydownHandler);
   };
 
   /** Метод, убирающий CSS-класс и обработчик */
   #disactivateBlocking = () => {
-    this.#element.classList.remove('ui-blocker--on');
-    document.removeEventListener('keydown', this.#documentKeydownHandler);
+    this.#element.classList.remove("ui-blocker--on");
+    document.removeEventListener("keydown", this.#documentKeydownHandler);
   };
 
   #documentKeydownHandler = (evt) => {

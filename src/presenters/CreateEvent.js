@@ -1,4 +1,4 @@
-import { remove, render, RenderPosition } from "../framework/render";
+import { render, RenderPosition } from "../framework/render";
 import EditFormView from "../view/EditForm";
 
 export default class CreateEventPresenter {

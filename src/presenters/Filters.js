@@ -1,4 +1,4 @@
-import { remove, render, RenderPosition } from "../framework/render";
+import { render, RenderPosition } from "../framework/render";
 import FiltersView from "../view/Filters";
 
 export default class FiltersPresenter {

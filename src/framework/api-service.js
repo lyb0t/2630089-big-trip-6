@@ -22,11 +22,11 @@ export default class ApiService {
    */
   async _load({
     url,
-    method = 'GET',
+    method = "GET",
     body = null,
     headers = new Headers(),
   }) {
-    headers.append('Authorization', this._authorization);
+    headers.append("Authorization", this._authorization);
 
     const response = await fetch(
       `${this._endPoint}/${url}`,

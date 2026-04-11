@@ -1,6 +1,6 @@
 const API_ROUTES = {
   loadPoints: "/points",
-  postPoint: `/points`,
+  postPoint: "/points",
   putPoint: (id) => `/points/${id}`,
   deletePoint: (id) => `/points/${id}`,
 
