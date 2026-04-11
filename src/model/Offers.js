@@ -13,6 +13,13 @@ class OffersModel {
       this.offers = res.body;
     }
   }
+
+  findOfferById(type, id) {
+    const offersObj = this.offers.find((offer) => offer.type === type);
+    const offers = offersObj ? offersObj.offers : [];
+
+    return offers.find((offer) => offer.id === id);
+  }
 }
 
 // Создаём единственный экземпляр и сразу его экспортируем

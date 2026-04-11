@@ -39,9 +39,7 @@ export default class EditFormView extends AbstractStatefulView {
 
   _toggleOffer(id) {
     const offers = this._state.offers;
-    console.log("old offers", offers);
     const isOffer = offers.includes(id);
-    console.log(isOffer);
     if (isOffer) {
       this._setState({
         offers: this._state.offers.filter((off) => off !== id),
@@ -52,7 +50,6 @@ export default class EditFormView extends AbstractStatefulView {
         offers: [...this._state.offers, id],
       });
     }
-    console.log("new offers", this._state.offers);
   }
 
   _destroyDatePickers() {
@@ -186,7 +183,6 @@ export default class EditFormView extends AbstractStatefulView {
       });
 
     this._escHandler = (e) => {
-      console.log("keyup");
       if (e.key === "Escape") {
         this.#onReject(e);
       }
@@ -198,14 +194,6 @@ export default class EditFormView extends AbstractStatefulView {
 
   _findDestinationByName(name) {
     return this.#destinations.find((dest) => dest.name === name);
-  }
-
-  _findOfferByName(name) {
-    return this.#destinations.find((dest) => dest.name === name);
-  }
-
-  _findOfferById(id) {
-    return this.#destinations.find((dest) => dest.id === id);
   }
 
   remove() {

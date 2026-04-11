@@ -83,7 +83,6 @@ export default class PointPresenter {
   }
 
   present() {
-    console.log("this.#point", this.#point);
     const contentContainer = document.querySelector(".trip-events");
 
     this._pointView = new PointView({

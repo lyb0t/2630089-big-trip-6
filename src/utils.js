@@ -22,7 +22,7 @@ async function myFetch(path, init) {
       ...init?.headers,
     },
   });
-  
+
   const result = {
     ok: res.ok,
     status: res.status,
@@ -34,9 +34,7 @@ async function myFetch(path, init) {
     if (res.body) {
       result.body = await res.json();
     }
-  } catch (error) {
-    console.log("попытка получить body потерпела крах");
-  }
+  } catch (error) {}
 
   return result;
 }

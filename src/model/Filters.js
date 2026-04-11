@@ -4,7 +4,8 @@ const filters = {
   present: (points) =>
     points.filter(
       (p) =>
-        +new Date(p.dateFrom) <= Date.now() && +new Date(p.dateTo) >= Date.now()
+        +new Date(p.dateFrom) <= Date.now() &&
+        +new Date(p.dateTo) >= Date.now(),
     ),
   past: (points) => points.filter((p) => +new Date(p.dateTo) < Date.now()),
 };
@@ -12,13 +13,15 @@ const filters = {
 export class FiltersModel {
   #filter = "everything";
 
+  filtersKeys = Object.keys(filters);
+
   #changeListeners = [];
   addChangeListener(listener) {
     this.#changeListeners.push(listener);
   }
 
-  filterPoints(points) {
-    return filters[this.#filter](points);
+  filterPoints(points, filter) {
+    return filters[filter || this.#filter](points);
   }
 
   get filter() {
@@ -26,7 +29,7 @@ export class FiltersModel {
   }
 
   set filter(filter) {
-    if (!Object.keys(filters).includes(filter)) {
+    if (!this.filtersKeys.includes(filter)) {
       throw new Error(`filter can be: ${Object.keys(filters).join(", ")}`);
     }
     this.#filter = filter;

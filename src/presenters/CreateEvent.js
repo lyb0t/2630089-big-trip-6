@@ -52,7 +52,6 @@ export default class CreateEventPresenter {
     }
     this.#onOpen();
     this.#filtersModel.filter = "everything";
-    console.log(this.#filtersModel.filter);
     this.#sortingModel.sortType = "day";
     this.#editFormView = new EditFormView({
       point: {

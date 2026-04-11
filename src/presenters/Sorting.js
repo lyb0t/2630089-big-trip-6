@@ -20,7 +20,6 @@ export default class SortingPresenter {
   }
 
   present() {
-    console.log("Sortings present");
     this.#sortingView = new SortingView((e, newSortType) => {
       this.#sortingModel.sortType = newSortType;
     });

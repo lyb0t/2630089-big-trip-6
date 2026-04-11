@@ -18,8 +18,8 @@ export class SortingModel {
     this.#changeListeners.push(listener);
   }
 
-  sortPoints(points) {
-    const sortedPoints = sortFuncs[this.#sortType](points);
+  sortPoints(points, sortType) {
+    const sortedPoints = sortFuncs[sortType || this.#sortType](points);
     return sortedPoints;
   }
 

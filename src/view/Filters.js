@@ -8,7 +8,6 @@ export default class FiltersView extends AbstractView {
     form.addEventListener("change", (event) => {
       const target = event.target;
       if (target.type === "radio" && target.name === "trip-filter") {
-        console.log("Выбран фильтр:", target.value);
         onFilterChange(target.value);
       }
     });
@@ -25,13 +24,23 @@ export default class FiltersView extends AbstractView {
     );
   }
 
-  disable() {
+  disable(filters) {
     const inputs = this.element.querySelectorAll(
       "input.trip-filters__filter-input",
     );
     inputs.forEach((input) => {
-      input.setAttribute("disabled", "true");
-      input.checked = false;
+      if (!filters) {
+        input.setAttribute("disabled", "true");
+        input.checked = false;
+        return;
+      }
+
+      if (filters.length !== 0 && filters.includes(input.value)) {
+        input.setAttribute("disabled", "true");
+        input.checked = false;
+      } else {
+        input.removeAttribute("disabled");
+      }
     });
   }
 

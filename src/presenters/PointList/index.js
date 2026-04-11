@@ -1,7 +1,6 @@
 import { remove, render, RenderPosition } from "../../framework/render";
 import UiBlocker from "../../framework/ui-blocker/ui-blocker";
 import BigMsgView from "../../view/BigMsg";
-import bigMsgView from "../../view/BigMsg";
 import PointPresenter from "./Point";
 
 export default class PointList {
@@ -98,7 +97,6 @@ export default class PointList {
   }
 
   present() {
-    console.log("PointList present");
     this.closeAllForms();
     this._removePointPresenters();
     this._removeEmptyMsg();

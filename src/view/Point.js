@@ -22,7 +22,6 @@ export default class PointView extends AbstractStatefulView {
     const favBtn = this.element.querySelector(".event__favorite-btn");
     favBtn.addEventListener("click", async (e) => {
       const result = await this._onFavoriteClick(e, this, this.element);
-      console.log(result);
       if (result) {
         this.updateElement({ isFavorite: !this._state.isFavorite });
       } else {

@@ -2,6 +2,7 @@ import CreateEventPresenter from "./presenters/CreateEvent";
 import FiltersPresenter from "./presenters/Filters";
 import PointListPresenter from "./presenters/PointList";
 import SortingPresenter from "./presenters/Sorting";
+import TripInfoPresenter from "./presenters/TripInfo";
 
 export default function present({
   pointsModel,
@@ -10,9 +11,15 @@ export default function present({
   destinationsModel,
   offersModel,
 }) {
-  const filtersPresenter = new FiltersPresenter({ pointsModel, filtersModel, sortingModel });
+  const filtersPresenter = new FiltersPresenter({
+    pointsModel,
+    filtersModel,
+    sortingModel,
+  });
 
   const sortingPresenter = new SortingPresenter({ pointsModel, sortingModel });
+
+  const tripInfoPresenter = new TripInfoPresenter({ pointsModel, offersModel, sortingModel });
 
   const pointListPresenter = new PointListPresenter({
     pointsModel,

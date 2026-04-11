@@ -20,7 +20,6 @@ export class PointsModel {
   }
 
   fireLoadListeners(result) {
-    console.log('fireLoadLis')
     this.#loadListeners.forEach((listener) => listener(result));
   }
 
